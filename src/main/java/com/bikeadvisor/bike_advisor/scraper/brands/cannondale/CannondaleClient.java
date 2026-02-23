@@ -1,5 +1,8 @@
 package com.bikeadvisor.bike_advisor.scraper.brands.cannondale;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -9,6 +12,7 @@ import java.time.Instant;
 
 public class CannondaleClient {
 
+    private static final Logger log = LoggerFactory.getLogger(CannondaleClient.class);
     private static final String API_URL = "https://www.cannondale.com/api/coveo/search";
 
     private final HttpClient client = HttpClient.newBuilder()
@@ -36,14 +40,13 @@ public class CannondaleClient {
                 .build();
 
         Instant start = Instant.now();
-        System.out.println("[CannondaleClient] Sending request at " + start);
+        log.info("Sending Cannondale fetch models request");
 
         HttpResponse<String> response =
                 client.send(request, HttpResponse.BodyHandlers.ofString());
 
         Instant end = Instant.now();
-        System.out.println("[CannondaleClient] Response received at " + end +
-                " (" + (end.toEpochMilli() - start.toEpochMilli()) + "ms)");
+        log.info("Cannondale fetch models response received in {}ms, status={}", end.toEpochMilli() - start.toEpochMilli(), response.statusCode());
 
         if (response.statusCode() != 200) {
             throw new IllegalStateException("Coveo search failed, status=" + response.statusCode()

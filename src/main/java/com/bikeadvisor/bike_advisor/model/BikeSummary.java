@@ -35,4 +35,12 @@ public class BikeSummary {
 
     public String getGeometryKey() { return geometryKey; }
     public void setGeometryKey(String geometryKey) { this.geometryKey = geometryKey; }
+
+    /**
+     * Stable, human-readable identifier composed from brand and geometryKey.
+     * e.g. "specialized_tarmac-sl8", "trek_domane-sl-6-gen-4"
+     */
+    public String getId() {
+        return (brand + "_" + geometryKey).toLowerCase().replaceAll("\\s+", "_");
+    }
 }
