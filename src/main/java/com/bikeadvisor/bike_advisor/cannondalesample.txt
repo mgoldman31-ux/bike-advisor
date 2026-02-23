@@ -1,0 +1,16 @@
+\"title\":\"SuperSix EVO LAB71 Frameset\",
+\"uri\":\"https://www.cannondale.com/en-us/bikes/road/race/supersix-evo/supersix-evo-lab71-frameset\",
+\"printableUri\":\"https://www.cannondale.com/en-us/bikes/road/race/supersix-evo/supersix-evo-lab71-frameset\",
+\"clickUri\":\"https://www.cannondale.com/en-us/bikes/road/race/supersix-evo/supersix-evo-lab71-frameset\",
+\"uniqueId\":\"42.63639$https://www.cannondale.com/en-us/bikes/road/race/supersix-evo/supersix-evo-lab71-frameset\",\
+"excerpt\":\"\",\"firstSentences\":null,\"summary\":null,\"flags\":\"SkipSentencesScoring;HasAllMetaDataStream\",
+\"hasHtmlVersion\":false,\"hasMobileHtmlVersion\":false,\"score\":521,\"percentScore\":51.361214,\"rankingInfo\":null,
+\"rating\":0.0,\"isTopResult\":false,\"isRecommendation\":false,\"isUserActionView\":false,\"titleHighlights\":[],
+\"firstSentencesHighlights\":[],\"excerptHighlights\":[],\"printableUriHighlights\":[],\"summaryHighlights\":[],
+\"parentResult\":null,\"childResults\":[],\"totalNumberOfChildResults\":0,\"absentTerms\":[],
+\"raw\":{\"systitle\":\"SuperSix EVO LAB71 Frameset\",\"subheader\":\"LAB71 Frameset\",\"sysurihash\":\"oðPMEWanBNHJtgcm\",
+\"urihash\":\"oðPMEWanBNHJtgcm\",\"sysuri\":\"https://www.cannondale.com/en-us/bikes/road/race/supersix-evo/supersix-evo-lab71-frameset\",
+\"colors\":[\"Grey\",\" Silver\",\"Pink\",\" Blue\",\" Navy\",\" Red\",\" Black\"],\"systransactionid\":766432,
+\"badges\":[\"New\"],\"subcategory\":\"Race\",\"brand\":\"Cannondale\",\"totalinventory\":0,\"documenttype\":\"Product\",
+\"sysindexeddate\":1771336974000,\"permanentid\":\"2e11236a8fd2cd86670a04ed4f8aaddf4860a4cf9ea7bcbad73eed04277b\",
+\"syslanguage\":[\"en-US\"],\"msrp\":5999.0,\"transactionid\":766432
