@@ -5,7 +5,6 @@ public class BikeSummary {
     private String model;           // e.g. "Tarmac SL8"
     private Integer modelYear;      // nullable if brand doesn’t expose
     private Discipline discipline;
-    private String wheelSize;
     private String productUrl;
     private String priceText;
     private String geometryKey;
@@ -23,9 +22,6 @@ public class BikeSummary {
 
     public Discipline getDiscipline() { return discipline; }
     public void setDiscipline(Discipline discipline) { this.discipline = discipline; }
-
-    public String getWheelSize() { return wheelSize; }
-    public void setWheelSize(String wheelSize) { this.wheelSize = wheelSize; }
 
     public String getProductUrl() { return productUrl; }
     public void setProductUrl(String productUrl) { this.productUrl = productUrl; }

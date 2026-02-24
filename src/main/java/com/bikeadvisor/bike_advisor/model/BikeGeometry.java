@@ -18,6 +18,7 @@ public class BikeGeometry {
     private Double seatTubeLength;
     private Double standover;
     private Double trail;
+    private String wheelSize;
 
     public void setBikeGeometryKey(String bikeGeometryKey) { this.bikeGeometryKey = bikeGeometryKey; }
     public String getBikeGeometryKey() { return bikeGeometryKey; }
@@ -49,5 +50,7 @@ public class BikeGeometry {
     public void setStandover(Double standover) { this.standover = standover; }
     public Double getTrail() { return trail; }
     public void setTrail(Double trail) { this.trail = trail; }
+    public String getWheelSize() { return wheelSize; }
+    public void setWheelSize(String wheelSize) { this.wheelSize = wheelSize; }
 
 }

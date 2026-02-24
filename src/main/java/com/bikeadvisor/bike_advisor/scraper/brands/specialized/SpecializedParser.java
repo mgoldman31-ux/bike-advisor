@@ -116,7 +116,16 @@ public class SpecializedParser {
         for (Element row : table.select("tbody tr")) {
             Elements cells = row.select("td");
             if (cells.size() < 2) continue;
-            String label = cells.first().text().trim().toLowerCase();
+            String label = cells.first().text().trim().toLowerCase().replace("-", " ");
+
+            // Wheel size is a string (e.g. "700c"), handle before numeric parsing
+            if (label.contains("wheel size")) {
+                String wheelSizeText = cells.get(1).text().trim();
+                if (!wheelSizeText.isEmpty()) {
+                    geometries.forEach(g -> g.setWheelSize(wheelSizeText));
+                }
+                continue;
+            }
 
             for (int i = 1; i < Math.min(cells.size(), sizes.size() + 1); i++) {
                 Double value = parseDouble(cells.get(i).text());
@@ -136,8 +145,8 @@ public class SpecializedParser {
         else if (label.contains("fork rake") || label.contains("fork offset")) geo.setForkOffset(value);
         else if (label.contains("trail"))                               geo.setTrail(value);
         else if (label.contains("wheelbase"))                           geo.setWheelbase(value);
-        else if (label.contains("chainstay"))                           geo.setChainstay(value);
-        else if (label.equals("bb drop"))                               geo.setBbDrop(value);
+        else if (label.contains("chainstay") || label.contains("chain stay")) geo.setChainstay(value);
+        else if (label.contains("bb drop") || label.contains("b b drop"))   geo.setBbDrop(value);
         else if (label.contains("stack"))                               geo.setStack(value);
         else if (label.contains("reach"))                               geo.setReach(value);
         else if (label.contains("standover") || label.contains("stand over")) geo.setStandover(value);

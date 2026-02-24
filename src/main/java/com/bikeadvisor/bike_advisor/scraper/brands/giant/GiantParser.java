@@ -25,7 +25,6 @@ public class GiantParser {
 
     private static final String BASE_URL = "https://www.giant-bicycles.com";
     private static final Pattern YEAR_PATTERN = Pattern.compile("\\b(20\\d{2})\\b");
-    private static final Pattern WHEEL_SIZE_PATTERN = Pattern.compile("\\bwheel-size-([\\w.]+)\\b");
 
     /**
      * Parses a Giant bike listing page.
@@ -54,7 +53,6 @@ public class GiantParser {
             String classAttr = tile.className();
 
             Integer modelYear = extractYear(classAttr);
-            String wheelSize = extractWheelSize(classAttr);
             Discipline discipline = inferDiscipline(classAttr);
 
             // "View X Models" tile — expand to individual models via the series compare table
@@ -64,7 +62,7 @@ public class GiantParser {
                     log.info("Following series page for '{}': {}", productName, productUrl);
                     Document seriesDoc = fetcher.apply(productUrl);
                     if (seriesDoc != null) {
-                        results.addAll(parseSeriesPage(seriesDoc, modelYear, wheelSize, discipline));
+                        results.addAll(parseSeriesPage(seriesDoc, modelYear, discipline));
                     }
                 }
                 continue;
@@ -80,7 +78,6 @@ public class GiantParser {
             bike.setBrand(Brand.GIANT.getBrandName());
             bike.setModel(productName);
             bike.setModelYear(modelYear);
-            bike.setWheelSize(wheelSize);
             bike.setProductUrl(productUrl);
             bike.setPriceText(priceText);
             bike.setGeometryKey(geometryKey);
@@ -94,10 +91,10 @@ public class GiantParser {
 
     /**
      * Parses individual models from a series page's compare table.
-     * Year, wheel size, and discipline are inherited from the series tile on the listing page,
+     * Year and discipline are inherited from the series tile on the listing page,
      * since the compare table does not carry those class-based attributes.
      */
-    private static List<BikeSummary> parseSeriesPage(Document doc, Integer modelYear, String wheelSize, Discipline discipline) {
+    private static List<BikeSummary> parseSeriesPage(Document doc, Integer modelYear, Discipline discipline) {
         List<BikeSummary> results = new ArrayList<>();
 
         Elements topParts = doc.select("table.serie-compare-table td.top-part");
@@ -127,7 +124,6 @@ public class GiantParser {
             bike.setBrand("Giant");
             bike.setModel(modelName);
             bike.setModelYear(modelYear);
-            bike.setWheelSize(wheelSize);
             bike.setProductUrl(productUrl);
             bike.setPriceText(priceText);
             bike.setGeometryKey(geometryKey);
@@ -173,6 +169,18 @@ public class GiantParser {
             String label = nameCell.text().toLowerCase();
 
             List<Element> valueCells = row.select("td.value");
+
+            // Tyre/wheel size is a string (e.g. "700 x 25c"), handle before numeric parsing
+            if (label.contains("tyre") || label.contains("tire") || label.contains("wheel size")) {
+                if (!valueCells.isEmpty()) {
+                    String tyreText = valueCells.get(0).text().trim();
+                    if (!tyreText.isEmpty()) {
+                        geometries.forEach(g -> g.setWheelSize(tyreText));
+                    }
+                }
+                continue;
+            }
+
             // loop through each size and extract the geometry values for that size
             for (int i = 0; i < Math.min(sizes.size(), valueCells.size()); i++) {
                 Element cell = valueCells.get(i);
@@ -220,11 +228,6 @@ public class GiantParser {
     private static Integer extractYear(String classAttr) {
         Matcher m = YEAR_PATTERN.matcher(classAttr);
         return m.find() ? Integer.parseInt(m.group(1)) : null;
-    }
-
-    private static String extractWheelSize(String classAttr) {
-        Matcher m = WHEEL_SIZE_PATTERN.matcher(classAttr);
-        return m.find() ? m.group(1) : null;
     }
 
     private static Discipline inferDiscipline(String classAttr) {

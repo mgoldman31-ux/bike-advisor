@@ -154,6 +154,12 @@ public class TrekParser {
     }
 
     private static void applyGeometryValue(BikeGeometry geo, String header, String cellText) {
+        // Wheel size is a string (e.g. "700c"), handle before numeric parsing
+        if (header.equals("geometrySizeWheel")) {
+            geo.setWheelSize(cellText.trim());
+            return;
+        }
+
         Double raw = parseDouble(cellText);
         if (raw == null) return;
 
@@ -176,7 +182,7 @@ public class TrekParser {
             case "geometryStandover"       -> geo.setStandover(value);
             case "geometryFrameReach"      -> geo.setReach(value);
             case "geometryFrameStack"      -> geo.setStack(value);
-            // geometrySizeWheel, saddle rail heights — ignored
+            // saddle rail heights — ignored
         }
     }
 

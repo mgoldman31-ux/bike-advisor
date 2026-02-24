@@ -41,6 +41,7 @@ public class GeometryVisionExtractor {
 
             Each object must use exactly these keys (use null if a value is not present in the table):
             - sizeLabel   (string: the size label, e.g. "44", "S", "M")
+            - wheelSize   (string: wheel diameter, e.g. "700c", "650b", "29\"")
             - reach
             - stack
             - topTubeEffective   (top tube horizontal or effective length)
@@ -174,6 +175,7 @@ public class GeometryVisionExtractor {
             BikeGeometry geo = new BikeGeometry();
             geo.setBikeGeometryKey(geometryKey);
             geo.setSizeLabel(textOrNull(node, "sizeLabel"));
+            geo.setWheelSize(textOrNull(node, "wheelSize"));
             geo.setReach(doubleOrNull(node, "reach"));
             geo.setStack(doubleOrNull(node, "stack"));
             geo.setTopTubeEffective(doubleOrNull(node, "topTubeEffective"));
