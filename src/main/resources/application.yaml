@@ -3,8 +3,8 @@ spring:
     name: bike-advisor
   datasource:
     url: jdbc:postgresql://localhost:5432/bikeadvisor
-    username: postgres
-    password: password
+    username: ${BIKE_DB_USER:postgres}
+    password: ${BIKE_DB_PASSWORD:password}
     driver-class-name: org.postgresql.Driver
   sql:
     init:
@@ -12,5 +12,4 @@ spring:
 
 logging:
   level:
-    com.bikeadvisor: DEBUG
-    org.springframework.jdbc.core: DEBUG
+    com.bikeadvisor: INFO

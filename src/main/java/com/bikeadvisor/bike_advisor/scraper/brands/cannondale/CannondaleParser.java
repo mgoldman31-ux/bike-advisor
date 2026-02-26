@@ -2,11 +2,13 @@ package com.bikeadvisor.bike_advisor.scraper.brands.cannondale;
 
 import com.bikeadvisor.bike_advisor.model.BikeSummary;
 import com.bikeadvisor.bike_advisor.model.Brand;
-import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CannondaleParser {
 
