@@ -21,7 +21,7 @@ public class CsvExporter {
 
     private static final CSVFormat BIKE_SUMMARY_FORMAT = CSVFormat.DEFAULT.builder()
             .setHeader("id", "brand", "model", "discipline", "modelYear",
-                       "priceText", "productUrl", "geometryKey")
+                       "price", "productUrl", "geometryKey")
             .build();
 
     private static final CSVFormat RIDE_CHARACTER_FORMAT = CSVFormat.DEFAULT.builder()
@@ -67,7 +67,7 @@ public class CsvExporter {
                         bike.getModel(),
                         bike.getDiscipline() != null ? bike.getDiscipline().name() : null,
                         bike.getModelYear(),
-                        bike.getPriceText(),
+                        bike.getPrice(),
                         bike.getProductUrl(),
                         bike.getGeometryKey()
                 );

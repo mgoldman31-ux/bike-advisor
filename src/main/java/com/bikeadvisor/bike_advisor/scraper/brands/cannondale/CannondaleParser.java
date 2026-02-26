@@ -36,7 +36,7 @@ public class CannondaleParser {
         for (JsonNode item : resultArray) {
             String model = item.path("title").asText();
             String url = item.path("uri").asText();
-            String price = String.valueOf(extractPrice(item));
+            double price = extractPrice(item);
             String geometryKey = item.path("raw").path("platform").asText();
 
             if (model.isEmpty() || url.isEmpty()) {
@@ -46,7 +46,7 @@ public class CannondaleParser {
 
             BikeSummary bike = new BikeSummary();
             bike.setModel(model);
-            bike.setPriceText(price);
+            bike.setPrice(price > 0 ? price : null);
             bike.setProductUrl(url);
             bike.setBrand(Brand.CANNONDALE.getBrandName());
             bike.setGeometryKey(geometryKey);

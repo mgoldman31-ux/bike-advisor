@@ -67,31 +67,37 @@ public class GeometryMetricsService {
     }
 
     /**
-     * Assigns each geometry row a size ordinal (0 = smallest, 1 = next, …) within its bike model.
+     * Assigns each geometry row a size bucket (0 = smallest, 1 = next, …) within its bike model.
      * Sizes are sorted by numeric value where possible ("54cm" → 54, "47" → 47), falling back to
      * alpha ordering (XS < S < M < L < XL). This lets bikes from different brands be compared
      * within the same ordinal bucket (e.g. all "second-smallest" sizes together).
      *
-     * @return flat map of "geometryKey::sizeLabel" → ordinal
+     * @return flat map of "geometryKey::sizeLabel" → bucket integer
      */
-    public Map<String, Integer> assignSizeOrdinals(List<BikeGeometry> geometries) {
+    public Map<String, Integer> assignSizeBuckets(List<BikeGeometry> geometries) {
         // Collect distinct size labels per model, preserving first-seen order for deduplication
         Map<String, LinkedHashSet<String>> sizesByModel = new HashMap<>();
         for (BikeGeometry g : geometries) {
+            // build map of geometry key -> list of available sizes
             sizesByModel.computeIfAbsent(g.getBikeGeometryKey(), k -> new LinkedHashSet<>())
                         .add(g.getSizeLabel());
         }
 
-        Map<String, Integer> ordinals = new HashMap<>();
+        Map<String, Integer> sizeBuckets = new HashMap<>();
+        // for each geometry key, get its size list and sort smallest to largest
+        // if sizeLabel is not a number, assign it to a number
         for (Map.Entry<String, LinkedHashSet<String>> entry : sizesByModel.entrySet()) {
             List<String> sortedSizes = entry.getValue().stream()
                     .sorted(Comparator.comparingDouble(GeometryMetricsService::parseSizeValue))
                     .toList();
+            // for each sorted size for the current geometry key, create a new string value to represent the size, which
+            // maps to a number 0 through the number of sizes, so that each size type falls to a scaled number
+            // (i.e. smallest size = 0, largest size = sortedSizes.size() - 1)
             for (int i = 0; i < sortedSizes.size(); i++) {
-                ordinals.put(sizeOrdinalKey(entry.getKey(), sortedSizes.get(i)), i);
+                sizeBuckets.put(generateSizeBucketKey(entry.getKey(), sortedSizes.get(i)), i);
             }
         }
-        return ordinals;
+        return sizeBuckets;
     }
 
     /**
@@ -99,17 +105,21 @@ public class GeometryMetricsService {
      * all sizes. Stats for ordinal 0 only include the smallest size of every model, ordinal 1 the
      * second-smallest, etc., so z-scores compare like-sized bikes.
      */
-    public Map<Integer, Map<GeometryMetricKey, GeometryMetricsStats>> computeStatsBySizeOrdinal(
-            List<BikeGeometry> geometries, Map<String, Integer> sizeOrdinals) {
+    public Map<Integer, Map<GeometryMetricKey, GeometryMetricsStats>> computeStatsBySizeBucket(
+            List<BikeGeometry> geometries, Map<String, Integer> sizeBuckets) {
 
-        Map<Integer, Map<GeometryMetricKey, List<Double>>> valuesByOrdinal = new HashMap<>();
+        // maps {sizeBucket->{geometry metric->geometry values}}
+        // so for size (0-n) for each geometry metric (trail, HTA, stack, etc.), store all values in order to calculate stats
+        Map<Integer, Map<GeometryMetricKey, List<Double>>> valuesBySizeBucket = new HashMap<>();
 
+        // build up geometry metrics for each size by looping through all geometry values
         for (BikeGeometry g : geometries) {
-            Integer ordinal = sizeOrdinals.get(sizeOrdinalKey(g.getBikeGeometryKey(), g.getSizeLabel()));
-            if (ordinal == null) continue;
+            // get the current geometry's size bucket
+            Integer sizeBucket = sizeBuckets.get(generateSizeBucketKey(g.getBikeGeometryKey(), g.getSizeLabel()));
+            if (sizeBucket == null) continue;
 
             Map<GeometryMetricKey, List<Double>> values =
-                    valuesByOrdinal.computeIfAbsent(ordinal, k -> new EnumMap<>(GeometryMetricKey.class));
+                    valuesBySizeBucket.computeIfAbsent(sizeBucket, k -> new EnumMap<>(GeometryMetricKey.class));
             addGeometryValue(values, GeometryMetricKey.TRAIL, g.getTrail());
             addGeometryValue(values, GeometryMetricKey.WHEELBASE, g.getWheelbase());
             addGeometryValue(values, GeometryMetricKey.HEAD_ANGLE, g.getHeadTubeAngle());
@@ -120,17 +130,18 @@ public class GeometryMetricsService {
         }
 
         Map<Integer, Map<GeometryMetricKey, GeometryMetricsStats>> result = new HashMap<>();
-        for (Map.Entry<Integer, Map<GeometryMetricKey, List<Double>>> entry : valuesByOrdinal.entrySet()) {
-            Map<GeometryMetricKey, GeometryMetricsStats> statsForOrdinal = new EnumMap<>(GeometryMetricKey.class);
+        // for each size bucket, calculate the stats for each geometry metric type and store in result to be returned
+        for (Map.Entry<Integer, Map<GeometryMetricKey, List<Double>>> entry : valuesBySizeBucket.entrySet()) {
+            Map<GeometryMetricKey, GeometryMetricsStats> statsForSizeBucket = new EnumMap<>(GeometryMetricKey.class);
             for (Map.Entry<GeometryMetricKey, List<Double>> metricEntry : entry.getValue().entrySet()) {
-                statsForOrdinal.put(metricEntry.getKey(), computeMetricsStats(metricEntry.getValue()));
+                statsForSizeBucket.put(metricEntry.getKey(), computeMetricsStats(metricEntry.getValue()));
             }
-            result.put(entry.getKey(), statsForOrdinal);
+            result.put(entry.getKey(), statsForSizeBucket);
         }
         return result;
     }
 
-    private static String sizeOrdinalKey(String geometryKey, String sizeLabel) {
+    private static String generateSizeBucketKey(String geometryKey, String sizeLabel) {
         return geometryKey + "::" + sizeLabel;
     }
 
@@ -185,7 +196,7 @@ public class GeometryMetricsService {
             Map<String, Integer> sizeOrdinals,
             BikeGeometry bikeGeometry) {
 
-        Integer ordinal = sizeOrdinals.get(sizeOrdinalKey(bikeGeometry.getBikeGeometryKey(), bikeGeometry.getSizeLabel()));
+        Integer ordinal = sizeOrdinals.get(generateSizeBucketKey(bikeGeometry.getBikeGeometryKey(), bikeGeometry.getSizeLabel()));
         Map<GeometryMetricKey, GeometryMetricsStats> stats =
                 ordinal != null ? statsByOrdinal.getOrDefault(ordinal, Map.of()) : Map.of();
 

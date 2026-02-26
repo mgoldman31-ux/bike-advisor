@@ -1,6 +1,8 @@
 package com.bikeadvisor.bike_advisor.export;
 
 import com.bikeadvisor.bike_advisor.model.BikeGeometry;
+import com.bikeadvisor.bike_advisor.model.BikeSummary;
+import com.bikeadvisor.bike_advisor.model.Discipline;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
@@ -22,6 +24,41 @@ public class CsvReader {
             .setHeader()
             .setSkipHeaderRecord(true)
             .build();
+
+    public List<BikeSummary> readBikes(Path inputPath) throws IOException {
+        List<BikeSummary> bikes = new ArrayList<>();
+
+        try (var parser = GEOMETRY_FORMAT.parse(new FileReader(inputPath.toFile()))) {
+            for (CSVRecord record : parser) {
+                BikeSummary bike = new BikeSummary();
+                bike.setBrand(record.get("brand"));
+                bike.setModel(record.get("model"));
+                bike.setProductUrl(record.get("productUrl"));
+                bike.setGeometryKey(record.get("geometryKey"));
+                String priceStr = getOptionalString(record, "price");
+                if (priceStr != null) {
+                    try { bike.setPrice(Double.parseDouble(priceStr)); } catch (NumberFormatException ignored) {}
+                }
+
+                String disciplineStr = getOptionalString(record, "discipline");
+                if (disciplineStr != null) {
+                    try { bike.setDiscipline(Discipline.valueOf(disciplineStr)); }
+                    catch (IllegalArgumentException ignored) {}
+                }
+
+                String modelYearStr = getOptionalString(record, "modelYear");
+                if (modelYearStr != null) {
+                    try { bike.setModelYear(Integer.parseInt(modelYearStr)); }
+                    catch (NumberFormatException ignored) {}
+                }
+
+                bikes.add(bike);
+            }
+        }
+
+        log.info("Read {} bikes from {}", bikes.size(), inputPath);
+        return bikes;
+    }
 
     public List<BikeGeometry> readGeometries(Path inputPath) throws IOException {
         List<BikeGeometry> geometries = new ArrayList<>();

@@ -59,7 +59,7 @@ public class SpecializedParser {
             bike.setBrand(Brand.SPECIALIZED.getBrandName());
             bike.setModel(name);
             bike.setProductUrl(productUrl);
-            bike.setPriceText(priceText);
+            bike.setPrice(BikeSummary.parsePrice(priceText));
             bike.setGeometryKey(geometryKey);
             bike.setDiscipline(Discipline.ROAD);
 

@@ -79,7 +79,7 @@ public class GiantParser {
             bike.setModel(productName);
             bike.setModelYear(modelYear);
             bike.setProductUrl(productUrl);
-            bike.setPriceText(priceText);
+            bike.setPrice(BikeSummary.parsePrice(priceText));
             bike.setGeometryKey(geometryKey);
             bike.setDiscipline(discipline);
 
@@ -125,7 +125,7 @@ public class GiantParser {
             bike.setModel(modelName);
             bike.setModelYear(modelYear);
             bike.setProductUrl(productUrl);
-            bike.setPriceText(priceText);
+            bike.setPrice(BikeSummary.parsePrice(priceText));
             bike.setGeometryKey(geometryKey);
             bike.setDiscipline(discipline);
 

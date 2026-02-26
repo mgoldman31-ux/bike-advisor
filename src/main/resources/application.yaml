@@ -1,3 +1,16 @@
 spring:
   application:
     name: bike-advisor
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bikeadvisor
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      mode: always
+
+logging:
+  level:
+    com.bikeadvisor: DEBUG
+    org.springframework.jdbc.core: DEBUG

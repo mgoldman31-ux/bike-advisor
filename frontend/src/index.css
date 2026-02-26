@@ -1,0 +1,60 @@
+:root {
+  --bg:          #2a2a2a;
+  --surface:     #323232;
+  --surface-2:   #3a3a3a;
+  --border:      #444;
+  --border-hover:#555;
+  --text:        #f0f0f0;
+  --text-muted:  #aaa;
+  --text-dim:    #777;
+  --green:       #39ff14;
+  --green-dim:   rgba(57, 255, 20, 0.12);
+
+  font-family: 'DM Sans', sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--text);
+  background-color: var(--bg);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.light-page {
+  --bg:          #ffffff;
+  --surface:     #f7f7f5;
+  --surface-2:   #eeeee9;
+  --border:      #e2e2da;
+  --border-hover:#ccc;
+  --text:        #1a1a1a;
+  --text-muted:  #555;
+  --text-dim:    #999;
+  --green:       #1a9e00;
+  --green-dim:   rgba(26, 158, 0, 0.08);
+
+  background-color: var(--bg);
+  color: var(--text);
+  min-height: calc(100vh - 52px);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  background-color: var(--bg);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button, select, input {
+  font-family: inherit;
+}

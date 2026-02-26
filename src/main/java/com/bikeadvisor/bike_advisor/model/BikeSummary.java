@@ -1,12 +1,15 @@
 package com.bikeadvisor.bike_advisor.model;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 public class BikeSummary {
     private String brand;           // Canonical brand name, e.g. "Specialized"
     private String model;           // e.g. "Tarmac SL8"
     private Integer modelYear;      // nullable if brand doesn’t expose
     private Discipline discipline;
     private String productUrl;
-    private String priceText;
+    private Double price;
     private String geometryKey;
 
     public String getBrand() {
@@ -26,17 +29,47 @@ public class BikeSummary {
     public String getProductUrl() { return productUrl; }
     public void setProductUrl(String productUrl) { this.productUrl = productUrl; }
 
-    public String getPriceText() { return priceText; }
-    public void setPriceText(String priceText) { this.priceText = priceText; }
+    public Double getPrice() { return price; }
+    public void setPrice(Double price) { this.price = price; }
+
+    /** Strips currency symbols and commas, then parses to Double. Returns null if unparseable.
+     *  For price ranges like "$850-900", returns the higher value. */
+    public static Double parsePrice(String text) {
+        if (text == null) return null;
+        String cleaned = text.replaceAll("[$,\\s]", "");
+        if (cleaned.isEmpty()) return null;
+        if (cleaned.matches("\\d+(\\.\\d+)?-\\d+(\\.\\d+)?")) {
+            String[] parts = cleaned.split("-");
+            try { return Math.max(Double.parseDouble(parts[0]), Double.parseDouble(parts[1])); }
+            catch (NumberFormatException ignored) {}
+        }
+        String numeric = cleaned.replaceAll("[^\\d.]", "");
+        if (numeric.isEmpty()) return null;
+        try { return Double.parseDouble(numeric); } catch (NumberFormatException e) { return null; }
+    }
 
     public String getGeometryKey() { return geometryKey; }
     public void setGeometryKey(String geometryKey) { this.geometryKey = geometryKey; }
 
     /**
-     * Stable, human-readable identifier composed from brand and geometryKey.
-     * e.g. "specialized_tarmac-sl8", "trek_domane-sl-6-gen-4"
+     * Unique, human-readable identifier derived from the product URL path.
+     * If the last path segment is a 4-digit year, it is combined with the preceding segment
+     * to preserve uniqueness across model years.
+     * e.g. "cannondale_supersix-evo-1", "cannondale_supersix-evo-1-2025"
+     * Falls back to brand + model slug if productUrl is unavailable.
      */
     public String getId() {
-        return (brand + "_" + geometryKey).toLowerCase().replaceAll("\\s+", "_");
+        if (productUrl != null) {
+            try {
+                String path = new URI(productUrl).getPath().replaceAll("/$", "");
+                String[] segs = path.split("/");
+                String last = segs[segs.length - 1];
+                String slug = last.matches("\\d{4}") && segs.length >= 2
+                        ? segs[segs.length - 2] + "-" + last
+                        : last;
+                return brand.toLowerCase().replaceAll("[^a-z0-9]+", "-") + "_" + slug;
+            } catch (URISyntaxException ignored) {}
+        }
+        return (brand + " " + model).toLowerCase().replaceAll("[^a-z0-9]+", "-");
     }
 }

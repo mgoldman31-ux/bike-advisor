@@ -76,7 +76,7 @@ public class TrekParser {
                 bike.setBrand(Brand.TREK.getBrandName());
                 bike.setModel(name);
                 bike.setProductUrl(productUrl);
-                bike.setPriceText(priceText);
+                bike.setPrice(BikeSummary.parsePrice(priceText));
                 bike.setGeometryKey(geometryKey);
                 bike.setDiscipline(Discipline.ROAD);
                 results.add(bike);

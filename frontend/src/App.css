@@ -1,0 +1,371 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Nav ─────────────────────────────────────── */
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0 2rem;
+  height: 52px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.nav-wordmark {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.05rem;
+  color: var(--green);
+  letter-spacing: 0.01em;
+  margin-right: 1.5rem;
+}
+
+.nav-tab {
+  padding: 0.3rem 0.85rem;
+  background: none;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  transition: color 0.15s, background 0.15s;
+}
+
+.nav-tab:hover {
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+.nav-tab.active {
+  color: var(--text);
+  background: var(--surface-2);
+  font-weight: 500;
+}
+
+/* ── Home page ───────────────────────────────── */
+.home {
+  max-width: 720px;
+  width: 100%;
+  margin: 5rem auto;
+  padding: 0 1.5rem;
+}
+
+.home-heading {
+  font-family: 'DM Serif Display', serif;
+  font-size: 2.4rem;
+  line-height: 1.15;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+
+.home-heading span {
+  color: var(--green);
+}
+
+.home-sub {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+
+/* ── Scatter plot ────────────────────────────── */
+.scatter-container {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem 1.25rem 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.scatter-header {
+  margin-bottom: 1rem;
+}
+
+.scatter-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.2rem;
+  color: var(--text);
+}
+
+.scatter-sub {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  margin-top: 0.2rem;
+}
+
+.scatter-axis-info {
+  display: flex;
+  gap: 1.5rem;
+  padding: 0.6rem 0 0.25rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  margin-top: 0.5rem;
+}
+
+.info-icon {
+  cursor: help;
+  color: var(--green);
+  font-size: 0.8rem;
+  margin-right: 0.3rem;
+  position: relative;
+}
+
+.info-icon::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: 130%;
+  left: 0;
+  background: var(--surface-2);
+  border: 1px solid var(--border-hover);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  width: 220px;
+  line-height: 1.4;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 10;
+}
+
+.info-icon:hover::after {
+  opacity: 1;
+}
+
+.scatter-tooltip {
+  background: var(--surface-2);
+  border: 1px solid var(--border-hover);
+  border-radius: 7px;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.scatter-tooltip-name {
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.15rem;
+}
+
+.scatter-tooltip-size {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.scatter-tooltip-stat {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.scatter-tooltip-count {
+  color: var(--green);
+  font-size: 0.75rem;
+  margin-top: 0.3rem;
+}
+
+/* ── Filter bar ──────────────────────────────── */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  align-items: flex-end;
+  padding: 1.1rem 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.filter-group label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+}
+
+.filter-group input {
+  padding: 0.45rem 0.7rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.88rem;
+  color: var(--text);
+  min-width: 140px;
+  transition: border-color 0.15s;
+}
+
+.filter-group input::placeholder {
+  color: var(--text-dim);
+}
+
+.filter-group input:focus {
+  outline: none;
+  border-color: var(--green);
+}
+
+.price-range {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+}
+
+.price-range input {
+  min-width: 80px;
+}
+
+.clear-btn {
+  padding: 0.45rem 0.9rem;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.clear-btn:hover {
+  border-color: var(--border-hover);
+  color: var(--text);
+}
+
+/* ── Bike list ───────────────────────────────── */
+.status {
+  color: var(--text-dim);
+  text-align: center;
+  margin-top: 3rem;
+  font-size: 0.9rem;
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.6rem;
+}
+
+.result-count {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+}
+
+.sort-select {
+  font-size: 0.78rem;
+  padding: 0.3rem 0.55rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.bike-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.bike-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1.1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.bike-card:hover {
+  border-color: var(--green);
+  background: var(--green-dim);
+}
+
+.bike-card-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.bike-brand {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+}
+
+.bike-model {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.bike-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.tag {
+  font-size: 0.68rem;
+  padding: 0.2rem 0.5rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.price {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--green);
+}
+
+/* ── Placeholder pages ───────────────────────── */
+.placeholder {
+  text-align: center;
+  margin-top: 8rem;
+  color: var(--text-dim);
+  font-size: 0.95rem;
+}
+
+/* ── Light pages (Stats, Methodology) ────────── */
+.light-section {
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 5rem 1.5rem 6rem;
+}
+
+.light-heading {
+  font-family: 'DM Serif Display', serif;
+  font-size: 2.4rem;
+  line-height: 1.15;
+  color: var(--text);
+  margin-bottom: 0.75rem;
+}
+
+.light-sub {
+  font-size: 1rem;
+  color: var(--text-muted);
+  max-width: 520px;
+  line-height: 1.65;
+}
