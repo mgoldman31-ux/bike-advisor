@@ -17,6 +17,3 @@ target/
 
 # Generated output files
 /*.csv
-/output.txt
-/geometry.jpg
-/geometry.png
