@@ -51,15 +51,20 @@ public class BikeSummaryRepository {
                                            Double minPrice, Double maxPrice) {
         String updatedBrand = capitalizeFirstLetter(brand);
         String sql = """
-                SELECT id, brand, model, discipline, model_year, price, product_url, geometry_key
-                FROM bike
-                WHERE (CAST(:brand AS TEXT) IS NULL OR brand = :brand)
-                  AND (CAST(:discipline AS TEXT) IS NULL OR discipline = :discipline)
-                  AND (CAST(:search AS TEXT) IS NULL OR LOWER(model) LIKE '%' || LOWER(:search) || '%'
-                                                     OR LOWER(brand) LIKE '%' || LOWER(:search) || '%')
-                  AND (CAST(:minPrice AS DOUBLE PRECISION) IS NULL OR price >= :minPrice)
-                  AND (CAST(:maxPrice AS DOUBLE PRECISION) IS NULL OR price <= :maxPrice)
-                ORDER BY brand, model
+                SELECT b.brand, b.model, b.discipline, b.model_year, b.price, b.product_url, b.geometry_key,
+                       AVG(rc.stability_index) AS stability_index,
+                       AVG(rc.aero_index)      AS aero_index,
+                       AVG(rc.agility_index)   AS agility_index
+                FROM bike b
+                LEFT JOIN ride_character rc ON rc.geometry_key = b.geometry_key
+                WHERE (CAST(:brand AS TEXT) IS NULL OR b.brand = :brand)
+                  AND (CAST(:discipline AS TEXT) IS NULL OR b.discipline = :discipline)
+                  AND (CAST(:search AS TEXT) IS NULL OR LOWER(b.model) LIKE '%' || LOWER(:search) || '%'
+                                                     OR LOWER(b.brand) LIKE '%' || LOWER(:search) || '%')
+                  AND (CAST(:minPrice AS DOUBLE PRECISION) IS NULL OR b.price >= :minPrice)
+                  AND (CAST(:maxPrice AS DOUBLE PRECISION) IS NULL OR b.price <= :maxPrice)
+                GROUP BY b.product_url, b.brand, b.model, b.discipline, b.model_year, b.price, b.geometry_key
+                ORDER BY b.brand, b.model
                 """;
 
         MapSqlParameterSource params = new MapSqlParameterSource()
@@ -84,6 +89,9 @@ public class BikeSummaryRepository {
             }
             int modelYear = rs.getInt("model_year");
             if (!rs.wasNull()) bike.setModelYear(modelYear);
+            bike.setStabilityIndex(rs.getObject("stability_index", Double.class));
+            bike.setAeroIndex(rs.getObject("aero_index", Double.class));
+            bike.setAgilityIndex(rs.getObject("agility_index", Double.class));
             return bike;
         });
     }

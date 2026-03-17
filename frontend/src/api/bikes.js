@@ -24,3 +24,9 @@ export async function fetchBikes(filters) {
   if (!res.ok) throw new Error('Failed to fetch bikes')
   return res.json()
 }
+
+export async function fetchBikeDetail(geometryKey) {
+  const res = await fetch(`${BASE_URL}/bikes/detail/${encodeURIComponent(geometryKey)}`)
+  if (!res.ok) throw new Error('Failed to fetch bike detail')
+  return res.json()
+}

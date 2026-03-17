@@ -25,9 +25,7 @@ public class CsvExporter {
             .build();
 
     private static final CSVFormat RIDE_CHARACTER_FORMAT = CSVFormat.DEFAULT.builder()
-            .setHeader("geometryKey", "sizeLabel",
-                       "stabilityIndex", "agilityIndex", "comfortIndex", "aggressionIndex", "handlingIndex",
-                       "stabilityZIndex", "agilityZIndex", "comfortZIndex", "aggressionZIndex", "handlingZIndex")
+            .setHeader("geometryKey", "sizeLabel", "stabilityIndex", "aeroIndex", "agilityIndex")
             .build();
 
     private static final CSVFormat GEOMETRY_FORMAT = CSVFormat.DEFAULT.builder()
@@ -43,15 +41,8 @@ public class CsvExporter {
                         rc.getGeometryKey(),
                         rc.getSizeLabel(),
                         rc.getStabilityIndex(),
-                        rc.getAgilityIndex(),
-                        rc.getComfortIndex(),
-                        rc.getAggressionIndex(),
-                        rc.getHandlingIndex(),
-                        rc.getStabilityZIndex(),
-                        rc.getAgilityZIndex(),
-                        rc.getComfortZIndex(),
-                        rc.getAggressionZIndex(),
-                        rc.getHandlingZIndex()
+                        rc.getAeroIndex(),
+                        rc.getAgilityIndex()
                 );
             }
         }

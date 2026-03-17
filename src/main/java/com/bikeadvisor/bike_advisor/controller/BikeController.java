@@ -1,11 +1,13 @@
 package com.bikeadvisor.bike_advisor.controller;
 
+import com.bikeadvisor.bike_advisor.dto.BikeDetailRow;
 import com.bikeadvisor.bike_advisor.dto.FilterOptions;
 import com.bikeadvisor.bike_advisor.dto.ScatterPoint;
 import com.bikeadvisor.bike_advisor.model.BikeSummary;
 import com.bikeadvisor.bike_advisor.repository.BikeGeometryRepository;
 import com.bikeadvisor.bike_advisor.repository.BikeSummaryRepository;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,6 +45,12 @@ public class BikeController {
             @RequestParam(required = false) Double minPrice,
             @RequestParam(required = false) Double maxPrice) {
         return bikeSummaryRepository.findByFilters(brand, discipline, search, minPrice, maxPrice);
+    }
+
+    /** Per-size geometry + ride character indexes for a single bike. */
+    @GetMapping("/detail/{geometryKey}")
+    public List<BikeDetailRow> getBikeDetail(@PathVariable String geometryKey) {
+        return bikeGeometryRepository.findDetailRows(geometryKey);
     }
 
     /** Available options for all filter dropdowns. */

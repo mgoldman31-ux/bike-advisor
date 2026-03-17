@@ -36,12 +36,11 @@ public class GeometryMetricsService {
         // for each geometry object in the input list, add its values to the list of all values in statValuesByMetric
         for (BikeGeometry g : geometries) {
             addGeometryValue(statValuesByMetric, GeometryMetricKey.TRAIL, g.getTrail());
-            addGeometryValue(statValuesByMetric, GeometryMetricKey.WHEELBASE, g.getWheelbase());
             addGeometryValue(statValuesByMetric, GeometryMetricKey.HEAD_ANGLE, g.getHeadTubeAngle());
             addGeometryValue(statValuesByMetric, GeometryMetricKey.REACH, g.getReach());
             addGeometryValue(statValuesByMetric, GeometryMetricKey.STACK, g.getStack());
             addGeometryValue(statValuesByMetric, GeometryMetricKey.CHAINSTAY, g.getChainstay());
-            addGeometryValue(statValuesByMetric, GeometryMetricKey.SEAT_TUBE_LENGTH, g.getSeatTubeLength());
+            addGeometryValue(statValuesByMetric, GeometryMetricKey.BB_DROP, g.getBbDrop());
         }
 
         // Maps the geometry metric name (trail, wheelbase, etc.) to its metrics stats object (min, max, stdev, etc.)
@@ -126,7 +125,7 @@ public class GeometryMetricsService {
             addGeometryValue(values, GeometryMetricKey.REACH, g.getReach());
             addGeometryValue(values, GeometryMetricKey.STACK, g.getStack());
             addGeometryValue(values, GeometryMetricKey.CHAINSTAY, g.getChainstay());
-            addGeometryValue(values, GeometryMetricKey.SEAT_TUBE_LENGTH, g.getSeatTubeLength());
+            addGeometryValue(values, GeometryMetricKey.BB_DROP, g.getBbDrop());
         }
 
         Map<Integer, Map<GeometryMetricKey, GeometryMetricsStats>> result = new HashMap<>();
@@ -190,82 +189,22 @@ public class GeometryMetricsService {
         return new GeometryMetricsStats(min, max, mean, stdDev);
     }
 
-    // Given a BikeGeometry object, compute its RideCharacter using size-bucketed z-scores
-    public RideCharacter getZGeometryMetrics(
-            Map<Integer, Map<GeometryMetricKey, GeometryMetricsStats>> statsByOrdinal,
-            Map<String, Integer> sizeOrdinals,
-            BikeGeometry bikeGeometry) {
-
-        Integer ordinal = sizeOrdinals.get(generateSizeBucketKey(bikeGeometry.getBikeGeometryKey(), bikeGeometry.getSizeLabel()));
-        Map<GeometryMetricKey, GeometryMetricsStats> stats =
-                ordinal != null ? statsByOrdinal.getOrDefault(ordinal, Map.of()) : Map.of();
-
-        double trail         = bikeGeometry.getTrail()         != null ? bikeGeometry.getTrail()         : 0.0;
-        double wheelbase     = bikeGeometry.getWheelbase()     != null ? bikeGeometry.getWheelbase()     : 0.0;
-        double chainstay     = bikeGeometry.getChainstay()     != null ? bikeGeometry.getChainstay()     : 0.0;
-        double headTubeAngle = bikeGeometry.getHeadTubeAngle() != null ? bikeGeometry.getHeadTubeAngle() : 0.0;
-        double reach         = bikeGeometry.getReach()         != null ? bikeGeometry.getReach()         : 0.0;
-        double stack         = bikeGeometry.getStack()         != null ? bikeGeometry.getStack()         : 0.0;
-        double seatTubeLength = bikeGeometry.getSeatTubeLength() != null ? bikeGeometry.getSeatTubeLength() : 0.0;
-
-        double zTrail = calculateZ(stats, GeometryMetricKey.TRAIL, trail);
-        double zWheelbase = calculateZ(stats, GeometryMetricKey.WHEELBASE, wheelbase);
-        double zChainstay = calculateZ(stats, GeometryMetricKey.CHAINSTAY, chainstay);
-        double zHeadTubeAngle = calculateZ(stats, GeometryMetricKey.HEAD_ANGLE, headTubeAngle);
-        double zReach = calculateZ(stats, GeometryMetricKey.REACH, reach);
-        double zStack = calculateZ(stats, GeometryMetricKey.STACK, stack);
-        double zSeatTubeLength = calculateZ(stats, GeometryMetricKey.SEAT_TUBE_LENGTH, seatTubeLength);
-
-        RideCharacter rc = new RideCharacter(bikeGeometry.getBikeGeometryKey(), bikeGeometry.getSizeLabel());
-
-        // TODO: will tweak these weights eventually
-        // Stability: higher = more stable
-        rc.setStabilityZIndex(0.35 * zTrail + 0.30 * zWheelbase + 0.10 * zChainstay + 0.20 * (1 - zHeadTubeAngle));
-
-        // Agility / Responsiveness
-        rc.setAgilityZIndex(0.40 * zHeadTubeAngle + 0.25 * (1 - zTrail) + 0.20 * (1 - zWheelbase) + 0.15 * (1 - zChainstay));
-
-        // Comfort
-        rc.setComfortZIndex(0.50 * zStack + 0.30 * (1 - zReach) + 0.20 * zSeatTubeLength);
-
-        // Aggression / Race
-        rc.setAggressionZIndex(0.35 * zReach + 0.30 * zHeadTubeAngle + 0.20 * (1 - zStack) + 0.15 * (1 - zTrail));
-
-        // Handling / Cornering
-        rc.setHandlingZIndex(0.35 * zTrail + 0.30 * (1 - zWheelbase) + 0.15 * (1 - zChainstay) + 0.20 * zHeadTubeAngle);
-
-        return rc;
-    }
-
-    private double calculateZ(Map<GeometryMetricKey, GeometryMetricsStats> stats, GeometryMetricKey key, double metricValue) {
-        GeometryMetricsStats s = stats.get(key);
-        if (s == null || s.stdDev() == 0) return 0.0;
-        return (metricValue - s.mean()) / s.stdDev();
-    }
-
+    /**
+     * Normalizes each ride character index from raw PCA scores to a 0–100 scale using
+     * min-max scaling across all bikes. Called after PcaService.buildRideCharacters().
+     */
     public void normalizeIndexes(List<RideCharacter> rideCharacters) {
-        // Step 1: find min/max for each index
-        double minStability = rideCharacters.stream().mapToDouble(RideCharacter::getStabilityZIndex).min().orElse(0);
-        double maxStability = rideCharacters.stream().mapToDouble(RideCharacter::getStabilityZIndex).max().orElse(1);
-
-        double minAgility = rideCharacters.stream().mapToDouble(RideCharacter::getAgilityZIndex).min().orElse(0);
-        double maxAgility = rideCharacters.stream().mapToDouble(RideCharacter::getAgilityZIndex).max().orElse(1);
-
-        double minComfort = rideCharacters.stream().mapToDouble(RideCharacter::getComfortZIndex).min().orElse(0);
-        double maxComfort = rideCharacters.stream().mapToDouble(RideCharacter::getComfortZIndex).max().orElse(1);
-
-        double minAggression = rideCharacters.stream().mapToDouble(RideCharacter::getAggressionZIndex).min().orElse(0);
-        double maxAggression = rideCharacters.stream().mapToDouble(RideCharacter::getAggressionZIndex).max().orElse(1);
-
-        double minHandling = rideCharacters.stream().mapToDouble(RideCharacter::getHandlingZIndex).min().orElse(0);
-        double maxHandling = rideCharacters.stream().mapToDouble(RideCharacter::getHandlingZIndex).max().orElse(1);
+        double minStability = rideCharacters.stream().mapToDouble(RideCharacter::getStabilityIndex).min().orElse(0);
+        double maxStability = rideCharacters.stream().mapToDouble(RideCharacter::getStabilityIndex).max().orElse(1);
+        double minAero      = rideCharacters.stream().mapToDouble(RideCharacter::getAeroIndex).min().orElse(0);
+        double maxAero      = rideCharacters.stream().mapToDouble(RideCharacter::getAeroIndex).max().orElse(1);
+        double minAgility   = rideCharacters.stream().mapToDouble(RideCharacter::getAgilityIndex).min().orElse(0);
+        double maxAgility   = rideCharacters.stream().mapToDouble(RideCharacter::getAgilityIndex).max().orElse(1);
 
         for (RideCharacter rc : rideCharacters) {
-            rc.setStabilityIndex(normalize(rc.getStabilityZIndex(), minStability, maxStability));
-            rc.setAgilityIndex(normalize(rc.getAgilityZIndex(), minAgility, maxAgility));
-            rc.setComfortIndex(normalize(rc.getComfortZIndex(), minComfort, maxComfort));
-            rc.setAggressionIndex(normalize(rc.getAggressionZIndex(), minAggression, maxAggression));
-            rc.setHandlingIndex(normalize(rc.getHandlingZIndex(), minHandling, maxHandling));
+            rc.setStabilityIndex(normalize(rc.getStabilityIndex(), minStability, maxStability));
+            rc.setAeroIndex(     normalize(rc.getAeroIndex(),      minAero,      maxAero));
+            rc.setAgilityIndex(  normalize(rc.getAgilityIndex(),   minAgility,   maxAgility));
         }
     }
 

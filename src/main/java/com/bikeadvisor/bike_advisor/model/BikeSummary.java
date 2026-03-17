@@ -51,6 +51,19 @@ public class BikeSummary {
     public String getGeometryKey() { return geometryKey; }
     public void setGeometryKey(String geometryKey) { this.geometryKey = geometryKey; }
 
+    private Double stabilityIndex;
+    private Double aeroIndex;
+    private Double agilityIndex;
+
+    public Double getStabilityIndex() { return stabilityIndex; }
+    public void setStabilityIndex(Double stabilityIndex) { this.stabilityIndex = stabilityIndex; }
+
+    public Double getAeroIndex() { return aeroIndex; }
+    public void setAeroIndex(Double aeroIndex) { this.aeroIndex = aeroIndex; }
+
+    public Double getAgilityIndex() { return agilityIndex; }
+    public void setAgilityIndex(Double agilityIndex) { this.agilityIndex = agilityIndex; }
+
     /**
      * Unique, human-readable identifier derived from the product URL path.
      * If the last path segment is a 4-digit year, it is combined with the preceding segment

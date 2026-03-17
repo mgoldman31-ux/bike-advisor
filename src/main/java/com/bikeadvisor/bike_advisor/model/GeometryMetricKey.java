@@ -7,5 +7,5 @@ public enum GeometryMetricKey {
     REACH,
     STACK,
     CHAINSTAY,
-    SEAT_TUBE_LENGTH
+    BB_DROP
 }

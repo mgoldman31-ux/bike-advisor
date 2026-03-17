@@ -4,6 +4,7 @@ import com.bikeadvisor.bike_advisor.export.CsvExporter;
 import com.bikeadvisor.bike_advisor.model.BikeGeometry;
 import com.bikeadvisor.bike_advisor.model.GeometryMetricKey;
 import com.bikeadvisor.bike_advisor.model.GeometryMetricsStats;
+import com.bikeadvisor.bike_advisor.model.PcaResult;
 import com.bikeadvisor.bike_advisor.model.RideCharacter;
 import com.bikeadvisor.bike_advisor.repository.BikeGeometryRepository;
 import com.bikeadvisor.bike_advisor.repository.BikeSummaryRepository;
@@ -24,6 +25,7 @@ public class DataRefreshService {
 
     private final ScrapingService scrapingService;
     private final GeometryMetricsService metricsService;
+    private final PcaService pcaService;
     private final CsvExporter csvExporter;
     private final BikeSummaryRepository bikeSummaryRepository;
     private final BikeGeometryRepository bikeGeometryRepository;
@@ -32,12 +34,14 @@ public class DataRefreshService {
     public DataRefreshService(
             ScrapingService scrapingService,
             GeometryMetricsService metricsService,
+            PcaService pcaService,
             CsvExporter csvExporter,
             BikeSummaryRepository bikeSummaryRepository,
             BikeGeometryRepository bikeGeometryRepository,
             RideCharacterRepository rideCharacterRepository) {
         this.scrapingService = scrapingService;
         this.metricsService = metricsService;
+        this.pcaService = pcaService;
         this.csvExporter = csvExporter;
         this.bikeSummaryRepository = bikeSummaryRepository;
         this.bikeGeometryRepository = bikeGeometryRepository;
@@ -66,10 +70,9 @@ public class DataRefreshService {
         Map<Integer, Map<GeometryMetricKey, GeometryMetricsStats>> statsByBucket =
                 metricsService.computeStatsBySizeBucket(geometries, sizeBuckets);
 
-        // 4. Build ride character indexes normalized to 0–100
-        List<RideCharacter> rideCharacters = geometries.stream()
-                .map(g -> metricsService.getZGeometryMetrics(statsByBucket, sizeBuckets, g))
-                .toList();
+        // 4. Fit PCA on the standardized geometry matrix, then normalize scores 0–100
+        PcaResult pcaResult = pcaService.fit(geometries, sizeBuckets, statsByBucket);
+        List<RideCharacter> rideCharacters = pcaService.buildRideCharacters(geometries, pcaResult, sizeBuckets);
         metricsService.normalizeIndexes(rideCharacters);
         log.info("Computed ride characters for {} geometry rows", rideCharacters.size());
 
@@ -84,5 +87,31 @@ public class DataRefreshService {
         rideCharacterRepository.saveAll(rideCharacters);
 
         log.info("Data refresh complete.");
+    }
+
+    /**
+     * Re-runs PCA on geometry data already in the database, updates ride_character scores,
+     * and returns a formatted summary of the loading matrix and index mapping.
+     */
+    public String refreshPca() {
+        log.info("Running PCA refresh from existing DB data...");
+
+        List<BikeGeometry> geometries = bikeGeometryRepository.findAll();
+        log.info("Loaded {} geometry rows from DB", geometries.size());
+
+        metricsService.deriveTrailWhereMissing(geometries);
+
+        Map<String, Integer> sizeBuckets = metricsService.assignSizeBuckets(geometries);
+        Map<Integer, Map<GeometryMetricKey, GeometryMetricsStats>> statsByBucket =
+                metricsService.computeStatsBySizeBucket(geometries, sizeBuckets);
+
+        PcaResult pcaResult = pcaService.fit(geometries, sizeBuckets, statsByBucket);
+        List<RideCharacter> rideCharacters = pcaService.buildRideCharacters(geometries, pcaResult, sizeBuckets);
+        metricsService.normalizeIndexes(rideCharacters);
+
+        rideCharacterRepository.saveAll(rideCharacters);
+        log.info("PCA refresh complete. Updated {} ride character rows.", rideCharacters.size());
+
+        return pcaService.formatSummary(pcaResult);
     }
 }

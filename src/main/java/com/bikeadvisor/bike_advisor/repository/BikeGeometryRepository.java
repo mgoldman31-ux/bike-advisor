@@ -1,5 +1,6 @@
 package com.bikeadvisor.bike_advisor.repository;
 
+import com.bikeadvisor.bike_advisor.dto.BikeDetailRow;
 import com.bikeadvisor.bike_advisor.dto.ScatterPoint;
 import com.bikeadvisor.bike_advisor.model.BikeGeometry;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -99,6 +100,63 @@ public class BikeGeometryRepository {
                 rs.getDouble("reach"),
                 rs.getString("wheel_size"),
                 rs.getInt("bike_count")
+        ));
+    }
+
+    public List<BikeGeometry> findAll() {
+        String sql = """
+                SELECT bike_geometry_key, size_label, wheel_size, reach, stack,
+                       top_tube_effective, head_tube_angle, seat_tube_angle_effective, head_tube_length,
+                       seat_tube_length, chainstay, wheelbase, bb_drop, fork_offset, trail, standover
+                FROM bike_geometry
+                """;
+        return jdbc.query(sql, new MapSqlParameterSource(), (rs, rowNum) -> {
+            BikeGeometry g = new BikeGeometry();
+            g.setBikeGeometryKey(rs.getString("bike_geometry_key"));
+            g.setSizeLabel(rs.getString("size_label"));
+            g.setWheelSize(rs.getString("wheel_size"));
+            g.setReach(rs.getObject("reach", Double.class));
+            g.setStack(rs.getObject("stack", Double.class));
+            g.setTopTubeEffective(rs.getObject("top_tube_effective", Double.class));
+            g.setHeadTubeAngle(rs.getObject("head_tube_angle", Double.class));
+            g.setSeatTubeAngleEffective(rs.getObject("seat_tube_angle_effective", Double.class));
+            g.setHeadTubeLength(rs.getObject("head_tube_length", Double.class));
+            g.setSeatTubeLength(rs.getObject("seat_tube_length", Double.class));
+            g.setChainstay(rs.getObject("chainstay", Double.class));
+            g.setWheelbase(rs.getObject("wheelbase", Double.class));
+            g.setBbDrop(rs.getObject("bb_drop", Double.class));
+            g.setForkOffset(rs.getObject("fork_offset", Double.class));
+            g.setTrail(rs.getObject("trail", Double.class));
+            g.setStandover(rs.getObject("standover", Double.class));
+            return g;
+        });
+    }
+
+    public List<BikeDetailRow> findDetailRows(String geometryKey) {
+        String sql = """
+                SELECT bg.size_label,
+                       bg.reach, bg.stack, bg.wheelbase, bg.head_tube_angle,
+                       bg.chainstay, bg.bb_drop, bg.trail,
+                       rc.stability_index, rc.aero_index, rc.agility_index
+                FROM bike_geometry bg
+                LEFT JOIN ride_character rc ON rc.geometry_key = bg.bike_geometry_key
+                                           AND rc.size_label = bg.size_label
+                WHERE bg.bike_geometry_key = :geometryKey
+                ORDER BY bg.size_label
+                """;
+        MapSqlParameterSource params = new MapSqlParameterSource().addValue("geometryKey", geometryKey);
+        return jdbc.query(sql, params, (rs, rowNum) -> new BikeDetailRow(
+                rs.getString("size_label"),
+                rs.getObject("reach", Double.class),
+                rs.getObject("stack", Double.class),
+                rs.getObject("wheelbase", Double.class),
+                rs.getObject("head_tube_angle", Double.class),
+                rs.getObject("chainstay", Double.class),
+                rs.getObject("bb_drop", Double.class),
+                rs.getObject("trail", Double.class),
+                rs.getObject("stability_index", Double.class),
+                rs.getObject("aero_index", Double.class),
+                rs.getObject("agility_index", Double.class)
         ));
     }
 

@@ -17,3 +17,5 @@ target/
 
 # Generated output files
 /*.csv
+
+/docs/results.txt

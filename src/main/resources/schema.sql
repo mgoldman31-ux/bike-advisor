@@ -31,17 +31,11 @@ CREATE TABLE IF NOT EXISTS bike_geometry (
 );
 
 CREATE TABLE IF NOT EXISTS ride_character (
-    geometry_key       VARCHAR(255)     NOT NULL,
-    size_label         VARCHAR(50)      NOT NULL,
-    stability_index    DOUBLE PRECISION,
-    agility_index      DOUBLE PRECISION,
-    comfort_index      DOUBLE PRECISION,
-    aggression_index   DOUBLE PRECISION,
-    handling_index     DOUBLE PRECISION,
-    stability_z_index  DOUBLE PRECISION,
-    agility_z_index    DOUBLE PRECISION,
-    comfort_z_index    DOUBLE PRECISION,
-    aggression_z_index DOUBLE PRECISION,
-    handling_z_index   DOUBLE PRECISION,
+    geometry_key    VARCHAR(255)     NOT NULL,
+    size_label      VARCHAR(50)      NOT NULL,
+    size_bucket     INTEGER,
+    stability_index DOUBLE PRECISION,
+    aero_index      DOUBLE PRECISION,
+    agility_index   DOUBLE PRECISION,
     PRIMARY KEY (geometry_key, size_label)
 );

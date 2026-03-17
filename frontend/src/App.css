@@ -281,14 +281,20 @@
 
 .bike-card {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 0.6rem;
   padding: 0.85rem 1.1rem;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
   cursor: pointer;
   transition: border-color 0.15s, background 0.15s;
+}
+
+.bike-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .bike-card:hover {
@@ -337,6 +343,177 @@
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--green);
+}
+
+/* ── Ride character index bars ───────────────── */
+.bike-indexes {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.index-bar-item {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.index-bar-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  min-width: 52px;
+}
+
+.index-bar-track {
+  width: 64px;
+  height: 3px;
+  background: var(--surface-2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.index-bar-fill {
+  height: 100%;
+  background: var(--green);
+  border-radius: 2px;
+  opacity: 0.75;
+}
+
+.index-bar-value {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  min-width: 22px;
+}
+
+/* ── Bike detail page ────────────────────────── */
+.detail-page {
+  max-width: 800px;
+  width: 100%;
+  margin: 3rem auto;
+  padding: 0 1.5rem;
+}
+
+.detail-back {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  margin-bottom: 1.75rem;
+  transition: color 0.15s;
+}
+
+.detail-back:hover {
+  color: var(--text);
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.detail-brand {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.detail-model {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.9rem;
+  line-height: 1.1;
+  color: var(--text);
+}
+
+.detail-header-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.detail-link {
+  font-size: 0.82rem;
+  color: var(--green);
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+.detail-link:hover {
+  opacity: 0.75;
+}
+
+/* ── Geometry table ──────────────────────────── */
+.geo-table-wrap {
+  overflow-x: auto;
+}
+
+.geo-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.geo-th {
+  text-align: right;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.geo-th:first-child {
+  text-align: left;
+}
+
+.index-col {
+  border-left: 1px solid var(--border);
+}
+
+.geo-row:hover {
+  background: var(--surface-2);
+}
+
+.geo-cell {
+  text-align: right;
+  padding: 0.5rem 0.75rem;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.geo-size {
+  text-align: left;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.geo-index {
+  font-weight: 600;
+  color: var(--text);
+  border-left: 1px solid var(--border);
+}
+
+.geo-units {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  margin-top: 0.75rem;
 }
 
 /* ── Placeholder pages ───────────────────────── */
