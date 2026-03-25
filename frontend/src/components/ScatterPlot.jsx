@@ -3,8 +3,8 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip
 } from 'recharts'
 
-const REACH_TOOLTIP = '[placeholder — your explanation of reach goes here]'
-const STACK_TOOLTIP = '[placeholder — your explanation of stack goes here]'
+const AERO_TOOLTIP = 'How aerodynamic and aggressive the riding position is — higher means more stretched out and fast.'
+const STABILITY_TOOLTIP = 'How planted and confidence-inspiring the handling is — higher means more stable at speed.'
 
 function InfoIcon({ text }) {
   return <span className="info-icon" data-tip={text}>ⓘ</span>
@@ -15,22 +15,23 @@ function CustomTooltip({ active, payload }) {
   const d = payload[0].payload
   return (
     <div className="scatter-tooltip">
-      <p className="scatter-tooltip-name">{d.name}</p>
+      <p className="scatter-tooltip-name">{d.brand} {d.model}</p>
       <p className="scatter-tooltip-size">Size: {d.sizeLabel}</p>
-      <p className="scatter-tooltip-stat">Reach: {d.x} mm</p>
-      <p className="scatter-tooltip-stat">Stack: {d.y} mm</p>
-      <p className="scatter-tooltip-count">
-        {d.bikeCount} {d.bikeCount === 1 ? 'bike' : 'bikes'} use this geometry
-      </p>
+      <p className="scatter-tooltip-stat">Stability: {Math.round(d.y)}</p>
+      <p className="scatter-tooltip-stat">Aero: {Math.round(d.x)}</p>
+      {d.bikeCount > 1 && (
+        <p className="scatter-tooltip-count">{d.bikeCount} bikes share this geometry</p>
+      )}
     </div>
   )
 }
 
 function ScatterPlot({ data }) {
   const points = data.map(d => ({
-    x: d.reach,
-    y: d.stack,
-    name: d.bikeGeometryKey,
+    x: d.aeroIndex,
+    y: d.stabilityIndex,
+    brand: d.brand,
+    model: d.model,
     sizeLabel: d.sizeLabel,
     bikeCount: d.bikeCount,
   }))
@@ -38,7 +39,7 @@ function ScatterPlot({ data }) {
   return (
     <div className="scatter-container">
       <div className="scatter-header">
-        <h2 className="scatter-title">Geometry Landscape</h2>
+        <h2 className="scatter-title">Ride Character Landscape</h2>
         <p className="scatter-sub">Each dot is one frame size. Hover for details.</p>
       </div>
 
@@ -48,11 +49,11 @@ function ScatterPlot({ data }) {
           <XAxis
             dataKey="x"
             type="number"
-            name="Reach"
-            domain={['auto', 'auto']}
+            name="Aero"
+            domain={[0, 100]}
             tick={{ fill: 'var(--text-muted)', fontSize: 11 }}
             label={{
-              value: 'Reach (mm)',
+              value: 'Aero Index',
               position: 'insideBottom',
               offset: -15,
               fill: 'var(--text-muted)',
@@ -62,11 +63,11 @@ function ScatterPlot({ data }) {
           <YAxis
             dataKey="y"
             type="number"
-            name="Stack"
-            domain={['auto', 'auto']}
+            name="Stability"
+            domain={[0, 100]}
             tick={{ fill: 'var(--text-muted)', fontSize: 11 }}
             label={{
-              value: 'Stack (mm)',
+              value: 'Stability Index',
               angle: -90,
               position: 'insideLeft',
               offset: 15,
@@ -86,8 +87,8 @@ function ScatterPlot({ data }) {
       </ResponsiveContainer>
 
       <div className="scatter-axis-info">
-        <span><InfoIcon text={REACH_TOOLTIP} /> Reach</span>
-        <span><InfoIcon text={STACK_TOOLTIP} /> Stack</span>
+        <span><InfoIcon text={AERO_TOOLTIP} /> Aero Index</span>
+        <span><InfoIcon text={STABILITY_TOOLTIP} /> Stability Index</span>
       </div>
     </div>
   )

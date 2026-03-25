@@ -55,12 +55,19 @@ function BikeDetail({ bike, onBack }) {
             <thead>
               <tr>
                 <th className="geo-th">Size</th>
+                <th className="geo-th">Wheel</th>
                 <th className="geo-th">Reach</th>
                 <th className="geo-th">Stack</th>
-                <th className="geo-th">Wheelbase</th>
+                <th className="geo-th">TT Eff</th>
                 <th className="geo-th">HTA</th>
+                <th className="geo-th">STA</th>
+                <th className="geo-th">HT Len</th>
+                <th className="geo-th">ST Len</th>
+                <th className="geo-th">Standover</th>
+                <th className="geo-th">Wheelbase</th>
                 <th className="geo-th">Chainstay</th>
                 <th className="geo-th">BB Drop</th>
+                <th className="geo-th">Fork Off</th>
                 <th className="geo-th">Trail</th>
                 <th className="geo-th index-col">Stability</th>
                 <th className="geo-th index-col">Aero</th>
@@ -71,12 +78,19 @@ function BikeDetail({ bike, onBack }) {
               {rows.map(row => (
                 <tr key={row.sizeLabel} className="geo-row">
                   <td className="geo-cell geo-size">{row.sizeLabel}</td>
+                  <td className="geo-cell">{row.wheelSize ?? '—'}</td>
                   <td className="geo-cell">{fmt(row.reach)}</td>
                   <td className="geo-cell">{fmt(row.stack)}</td>
-                  <td className="geo-cell">{fmt(row.wheelbase)}</td>
+                  <td className="geo-cell">{fmt(row.topTubeEffective)}</td>
                   <td className="geo-cell">{fmt(row.headTubeAngle, 1)}°</td>
+                  <td className="geo-cell">{fmt(row.seatTubeAngleEffective, 1)}°</td>
+                  <td className="geo-cell">{fmt(row.headTubeLength)}</td>
+                  <td className="geo-cell">{fmt(row.seatTubeLength)}</td>
+                  <td className="geo-cell">{fmt(row.standover)}</td>
+                  <td className="geo-cell">{fmt(row.wheelbase)}</td>
                   <td className="geo-cell">{fmt(row.chainstay)}</td>
                   <td className="geo-cell">{fmt(row.bbDrop)}</td>
+                  <td className="geo-cell">{fmt(row.forkOffset)}</td>
                   <td className="geo-cell">{fmt(row.trail)}</td>
                   <IndexCell value={row.stabilityIndex} />
                   <IndexCell value={row.aeroIndex} />
@@ -85,7 +99,7 @@ function BikeDetail({ bike, onBack }) {
               ))}
             </tbody>
           </table>
-          <p className="geo-units">All measurements in mm except head tube angle (degrees). Indexes 0–100.</p>
+          <p className="geo-units">All measurements in mm except HTA and STA (degrees). Indexes 0–100.</p>
         </div>
       )}
     </div>
